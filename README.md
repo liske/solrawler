@@ -2,12 +2,12 @@
 
 *solrawler* is a simple python based web crawler for SOLR. It uses the following python packages:
 
-- scrapy for web crawling
-- pysolr for SOLR API access
-- beautifulsoup4 for HTML text extraction
-- pypdf2 for PDF text extraction
+- [Scrapy](https://scrapy.org/) for web crawling
+- [pysolr](https://github.com/django-haystack/pysolr) for SOLR API access
+- [beautifulsoup4](https://www.crummy.com/software/BeautifulSoup/) for HTML text extraction
+- [pypdf2](https://mstamy2.github.io/PyPDF2/) for PDF text extraction
 
-It is designed to be run inside docker. There are two environment variables to control *solrawler*:
+It is designed to be run inside docker. There are two environment variables to configure *solrawler*:
 
 - `SOLRAWLER_SOLR` - the SOLR API url including the core (default: `http://solr:8983/solr/solrawler`)
 - `SOLRAWLER_WAIT` - wait time in seconds between crawling runs, used by entrypoint (default: `8400`s)
