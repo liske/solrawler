@@ -9,6 +9,7 @@ from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 import PyPDF2
 
+from collections import OrderedDict
 import io
 import re
 
@@ -43,13 +44,15 @@ class CommonSpider(scrapy.Spider):
             }
 
             # copy some http headers
-            for field in ['Content-Type', 'Date', 'Last-Modified']:
-                if field in response.headers:
-                    dfield = field.lower()
-                    if dfield == 'last-modified':
-                        dfield = 'date'
-                    item['solr'][dfield] = response.headers[field].decode(
-                        'ascii')
+            for header, field in OrderedDict([
+                ('Content-Type', 'content-type'),
+                ('Last-Modified', 'date'),
+                ('Date', 'date'),
+            ]).items():
+                if header in response.headers:
+                    if not field in item['solr']:
+                        item['solr'][field] = response.headers[header].decode(
+                            'ascii')
 
             # handle text/* MIME types
             if response.__class__.__name__ in ['TextResponse', 'HtmlResponse']:
