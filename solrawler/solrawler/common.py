@@ -15,6 +15,18 @@ import re
 
 class CommonSpider(scrapy.Spider):
     seen = set()
+    bs4_blacklist = [
+        '[document]',
+        'noscript',
+        'header',
+        'html',
+        'meta',
+        'head',
+        'input',
+        'script',
+        'style',
+        'title',
+    ]
 
     def parse(self, response):
         if response.url in self.seen:
@@ -48,10 +60,13 @@ class CommonSpider(scrapy.Spider):
 
                     # get html title
                     if soup.title and soup.title.string:
-                        title = soup.title.string
+                        item['solr']['title'] = soup.title.string
 
                     # extract body text
-                    item['solr']['text'] = ''.join(soup.get_text())
+                    text = soup.find_all(text=True)
+
+                    item['solr']['text'] = ''.join(
+                        list(filter(lambda t: t.parent.name not in self.bs4_blacklist, text)))
 
                     # follow links
                     for link in soup.find_all('a'):
@@ -65,6 +80,10 @@ class CommonSpider(scrapy.Spider):
                 # handle everything else as plain text response
                 else:
                     item['solr']['text'] = response.text
+
+                # strip and remove duplicate spaces
+                item['solr']['text'] = re.sub(
+                    '\n\s+', '\n', re.sub('[ \t]+', ' ', item['solr']['text'])).strip()
 
                 yield item
 
@@ -90,6 +109,10 @@ class CommonSpider(scrapy.Spider):
                         page = pdf.getPage(idx)
                         idx += 1
                         item['solr']['text'] += ' ' + page.extractText()
+
+                    # strip and remove duplicate spaces
+                    item['solr']['text'] = re.sub(
+                        '\n\s+', '\n', re.sub('[ \t]+', ' ', item['solr']['text'])).strip()
 
                     yield item
 
