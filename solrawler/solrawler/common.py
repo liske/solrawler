@@ -99,7 +99,7 @@ class CommonSpider(scrapy.Spider):
                     # get title from documentInfo
                     titles = []
                     for field in ['/Title', '/Subject']:
-                        if field in pdf.documentInfo:
+                        if field in pdf.documentInfo and pdf.documentInfo[field]:
                             titles.append(pdf.documentInfo[field])
                     if titles:
                         item['solr']['title'] = ', '.join(titles)
